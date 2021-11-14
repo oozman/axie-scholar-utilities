@@ -21,7 +21,7 @@ from axie.utils import (
 )
 
 
-CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
+CREATOR_FEE_ADDRESS = "ronin:xxx"
 
 now = int(datetime.now().timestamp())
 log_file = f'logs/payment_results_{now}.log'
@@ -311,18 +311,18 @@ class AxiePaymentsManager:
                             self.summary
                         ))
             # Creator fee
-            fee_payout = round(fee * 0.01)
-            if fee_payout > 1:
-                total_dono += fee_payout
-                acc_payments.append(Payment(
-                            f"Donation to software creator for {acc['Name']}",
-                            "donation",
-                            acc["AccountAddress"],
-                            self.secrets_file[acc["AccountAddress"]],
-                            CREATOR_FEE_ADDRESS,
-                            fee_payout,
-                            self.summary
-                        ))
+            #fee_payout = round(fee * 0.01)
+            #if fee_payout > 1:
+            #    total_dono += fee_payout
+            #    acc_payments.append(Payment(
+            #                f"Donation to software creator for {acc['Name']}",
+            #                "donation",
+            #                acc["AccountAddress"],
+            #                self.secrets_file[acc["AccountAddress"]],
+            #                CREATOR_FEE_ADDRESS,
+            #                fee_payout,
+            #                self.summary
+            #            ))
             # manager payment
             acc_payments.append(Payment(
                 f"Payment to manager of {acc['Name']}",
@@ -397,19 +397,19 @@ class AxiePaymentsManager:
                         manager_payout -= dono_amount
                         total_payments += dono_amount
             # Fee Payments
-            fee_amount = round(acc_balance * 0.01)
-            if fee_amount > 0:
-                acc_payments.append(Payment(
-                            f"Donation to software creator for {acc['Name']}",
-                            "donation",
-                            acc["AccountAddress"],
-                            self.secrets_file[acc["AccountAddress"]],
-                            CREATOR_FEE_ADDRESS,
-                            fee_amount,
-                            self.summary
-                        ))
-                manager_payout -= fee_amount
-                total_payments += fee_amount
+            #fee_amount = round(acc_balance * 0.01)
+            #if fee_amount > 0:
+            #    acc_payments.append(Payment(
+            #                f"Donation to software creator for {acc['Name']}",
+            #                "donation",
+            #                acc["AccountAddress"],
+            #                self.secrets_file[acc["AccountAddress"]],
+            #                CREATOR_FEE_ADDRESS,
+            #                fee_amount,
+            #                self.summary
+            #            ))
+            #    manager_payout -= fee_amount
+            #    total_payments += fee_amount
             # Manager Payment
             if manager_payout > 0:
                 acc_payments.append(Payment(
