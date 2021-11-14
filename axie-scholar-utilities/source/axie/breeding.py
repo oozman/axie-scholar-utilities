@@ -160,15 +160,15 @@ class AxieBreedManager:
             )
             b.execute()
         logging.info("Done breeding axies")
-        fee = self.calculate_fee_cost()
-        logging.info(f"Time to pay the fee for breeding. For this session it is: {fee} SLP")
-        p = Payment(
-            "Breeding Fee",
-            "donation",
-            self.payment_account,
-            self.secrets[self.payment_account],
-            CREATOR_FEE_ADDRESS,
-            fee,
-            PaymentsSummary()
-        )
-        p.execute()
+        #fee = self.calculate_fee_cost()
+        #logging.info(f"Time to pay the fee for breeding. For this session it is: {fee} SLP")
+        #p = Payment(
+        #    "Breeding Fee",
+        #    "donation",
+        #    self.payment_account,
+        #    self.secrets[self.payment_account],
+        #    CREATOR_FEE_ADDRESS,
+        #    fee,
+        #    PaymentsSummary()
+        #)
+        #p.execute()
