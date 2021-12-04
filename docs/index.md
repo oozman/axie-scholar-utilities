@@ -1,10 +1,12 @@
 ## Welcome to Axie Scholar Utilities Wiki
-[![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
+[![CI to Docker Hub](https://github.com/FerranMarin/axie-scholar-utilities/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/FerranMarin/axie-scholar-utilities/actions/workflows/test.yml)
 [![Docker Image](https://img.shields.io/badge/docker%20image-available-blue)](https://hub.docker.com/r/epith/axie-scholar-utilities)
 
 In these pages we will cover all the information you need to install and use axie scholar utilities tool.
 
 # How to install this tool
+If you are planning to use TREZOR, you must follow the Poetry installation.
+
 ## Install Using Docker
 This is the recomended way of installing and using my tool. Follow one of these links for installing with docker:
 
@@ -36,7 +38,7 @@ To read the instructions on how to run these commands:
 - [Commands for Docker and Docker Hub](./pages/docker_hub_cmds.html)
 - [Commands for Docker-compose](./pages/docker_compose_cmds.html)
 - [Commands for Poetry](./pages/poetry_cmds.html)
-
+- [Commands for Trezor (Poetry)](./pages/trezor_cmds.html)
 
 # File Format
 This tool depends on various files. To learn more about them follow this [link](./pages/file_formats.html).

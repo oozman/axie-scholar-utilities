@@ -1,5 +1,5 @@
 # Axie Scholars Utilities
-[![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
+[![CI to Docker Hub](https://github.com/FerranMarin/axie-scholar-utilities/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/FerranMarin/axie-scholar-utilities/actions/workflows/test.yml)
 [![Docker Image](https://img.shields.io/badge/docker%20image-available-blue)](https://hub.docker.com/r/epith/axie-scholar-utilities)
 
 This software's intent is to automate all activities related to manage Scholars. It is specially aimed to mangers with large scholar roasters.
@@ -15,8 +15,9 @@ As of now it has the following commands:
 - Axie Breeding
 - QR Code Generation
 
-To know how to use it, install it, please visit the [wiki](https://ferranmarin.github.io/axie-scholar-utilities/)
+**WITH TREZOR SUPORT!**
 
+To know how to use it, install it, please visit the [wiki](https://ferranmarin.github.io/axie-scholar-utilities/)
 
 # How is this and future developments financed?
 
@@ -41,7 +42,6 @@ You can breed using multiple accounts and pay the fee with another one. More ins
 
 # Roadmap
 
-- Add capability to payout from accounts with Trezor (needs investigation)
 - Release a desktop app (even more convenient)
 - Integrate with Discord (via a self-hosted bot, it will be 100% yours!)
 - ...
