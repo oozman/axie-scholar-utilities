@@ -18,7 +18,8 @@ payments_schema = {
                     "AccountAddress",
                     "ScholarPayoutAddress",
                     "ScholarPayout",
-                    "ManagerPayout"
+                    "ManagerPayout",
+                    "MyAxie"
                 ],
                 "dependencies": {
                     "TrainerPayoutAddress": ["TrainerPayout"],
@@ -51,6 +52,9 @@ payments_schema = {
                     "ManagerPayout": {
                         "type": "number",
                         "minimum": 1
+                    },
+                    "MyAxie": {
+                        "type": "object"
                     }
                 },
                 "additionalProperties": False
