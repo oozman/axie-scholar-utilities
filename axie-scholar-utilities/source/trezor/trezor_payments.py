@@ -45,7 +45,7 @@ class TrezorPayment:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.name = name
         self.payment_type = payment_type
         self.from_acc = from_acc.replace("ronin:", "0x")
@@ -90,6 +90,11 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
+        logging.info(f'Important: Debugging information {sig}')
+        if sig[1][:4] == b'0x00':
+            sig[1] = b'0x' + sig[1][4:]
+        if sig[2][:4] == b'0x00':
+            sig[2] = b'0x' + sig[2][4:]
         replacement_tx = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(replacement_tx)
@@ -148,6 +153,11 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
+        logging.info(f'Important: Debugging information {sig}')
+        if sig[1][:4] == b'0x00':
+            sig[1] = b'0x' + sig[1][4:]
+        if sig[2][:4] == b'0x00':
+            sig[2] = b'0x' + sig[2][4:]
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)

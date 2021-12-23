@@ -39,7 +39,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         with open("axie/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
@@ -60,7 +60,10 @@ class TrezorClaim(TrezorAxieGraphQL):
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
-            return int(response.json()['total'])
+            in_game_total = int(response.json()['total'])
+            wallet_total = check_balance(self.account)
+            if in_game_total > wallet_total:
+                return in_game_total - wallet_total
         return None
 
     async def execute(self):
@@ -73,7 +76,8 @@ class TrezorClaim(TrezorAxieGraphQL):
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         if not jwt:
-            logging.critical(f"Important: Skipping claiming, we could not get the JWT for account {self.account.replace('0x', 'ronin:')}")
+            logging.critical("Important: Skipping claiming, we could not get the JWT for account "
+                             f"{self.account.replace('0x', 'ronin:')}")
             return
         headers = {
             "User-Agent": self.user_agent,
@@ -117,6 +121,11 @@ class TrezorClaim(TrezorAxieGraphQL):
             data=data,
             chain_id=2020
         )
+        logging.info(f'Important: Debugging information {sig}')
+        if sig[1][:4] == b'0x00':
+            sig[1] = b'0x' + sig[1][4:]
+        if sig[2][:4] == b'0x00':
+            sig[2] = b'0x' + sig[2][4:]
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)

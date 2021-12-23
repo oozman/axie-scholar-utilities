@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from web3 import Web3
 import requests
 
-from axie.utils import check_balance, RONIN_PROVIDER, AXIE_CONTRACT, USER_AGENT
+from axie.utils import check_balance, RONIN_PROVIDER, AXIE_CONTRACT
 
 
 class Axies:
@@ -13,7 +13,7 @@ class Axies:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.acc = account.replace("ronin:", "0x")
         with open("axie/axie_abi.json") as f:
             axie_abi = json.load(f)
@@ -76,5 +76,4 @@ class Axies:
                 birth_date = json_response["data"]["axie"]["birthDate"]
                 morph_date = datetime.fromtimestamp(birth_date) + timedelta(days=5)
                 return morph_date, body_shape
-
         return None, None

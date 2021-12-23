@@ -1,5 +1,5 @@
 import builtins
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from mock import patch, call, mock_open
 from freezegun import freeze_time
@@ -21,7 +21,7 @@ def test_axies_init(mocked_provider, mocked_checksum, mocked_contract):
         a = Axies("ronin:abc1")
     mocked_provider.assert_called_with(
         RONIN_PROVIDER,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
