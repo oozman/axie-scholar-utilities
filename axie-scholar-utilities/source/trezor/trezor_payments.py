@@ -27,7 +27,7 @@ from axie.utils import (
 from trezor.trezor_utils import CustomUI
 
 
-CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
+CREATOR_FEE_ADDRESS = "ronin:xxx"
 
 now = int(datetime.now().timestamp())
 log_file = f'logs/results_{now}.log'
@@ -315,20 +315,20 @@ class TrezorAxiePaymentsManager:
                         manager_payout -= dono_amount
                         total_payments += dono_amount
             # Fee Payments
-            fee_amount = round(acc_balance * 0.01)
-            if fee_amount > 0:
-                acc_payments.append(TrezorPayment(
-                            f"Donation to software creator for {acc['Name']}",
-                            "donation",
-                            client,
-                            bip_path,
-                            acc["AccountAddress"].lower(),
-                            CREATOR_FEE_ADDRESS,
-                            fee_amount,
-                            self.summary
-                        ))
-                manager_payout -= fee_amount
-                total_payments += fee_amount
+            #fee_amount = round(acc_balance * 0.01)
+            #if fee_amount > 0:
+            #    acc_payments.append(TrezorPayment(
+            #                f"Donation to software creator for {acc['Name']}",
+            #                "donation",
+            #                client,
+            #                bip_path,
+            #                acc["AccountAddress"].lower(),
+            #                CREATOR_FEE_ADDRESS,
+            #                fee_amount,
+            #                self.summary
+            #            ))
+            #   manager_payout -= fee_amount
+            #    total_payments += fee_amount
             # Manager Payment
             if manager_payout > 0:
                 acc_payments.append(TrezorPayment(
