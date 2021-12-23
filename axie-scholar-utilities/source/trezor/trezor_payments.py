@@ -27,7 +27,7 @@ from axie.utils import (
 from trezor.trezor_utils import CustomUI
 
 
-CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
+CREATOR_FEE_ADDRESS = "ronin:xxx"
 
 now = int(datetime.now().timestamp())
 log_file = f'logs/results_{now}.log'
@@ -45,7 +45,7 @@ class TrezorPayment:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.name = name
         self.payment_type = payment_type
         self.from_acc = from_acc.replace("ronin:", "0x")
@@ -90,6 +90,11 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
+        logging.info(f'Important: Debugging information {sig}')
+        if sig[1][:4] == b'0x00':
+            sig[1] = b'0x' + sig[1][4:]
+        if sig[2][:4] == b'0x00':
+            sig[2] = b'0x' + sig[2][4:]
         replacement_tx = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(replacement_tx)
@@ -148,6 +153,11 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
+        logging.info(f'Important: Debugging information {sig}')
+        if sig[1][:4] == b'0x00':
+            sig[1] = b'0x' + sig[1][4:]
+        if sig[2][:4] == b'0x00':
+            sig[2] = b'0x' + sig[2][4:]
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
@@ -305,20 +315,20 @@ class TrezorAxiePaymentsManager:
                         manager_payout -= dono_amount
                         total_payments += dono_amount
             # Fee Payments
-            fee_amount = round(acc_balance * 0.01)
-            if fee_amount > 0:
-                acc_payments.append(TrezorPayment(
-                            f"Donation to software creator for {acc['Name']}",
-                            "donation",
-                            client,
-                            bip_path,
-                            acc["AccountAddress"].lower(),
-                            CREATOR_FEE_ADDRESS,
-                            fee_amount,
-                            self.summary
-                        ))
-                manager_payout -= fee_amount
-                total_payments += fee_amount
+            #fee_amount = round(acc_balance * 0.01)
+            #if fee_amount > 0:
+            #    acc_payments.append(TrezorPayment(
+            #                f"Donation to software creator for {acc['Name']}",
+            #                "donation",
+            #                client,
+            #                bip_path,
+            #                acc["AccountAddress"].lower(),
+            #                CREATOR_FEE_ADDRESS,
+            #                fee_amount,
+            #                self.summary
+            #            ))
+            #   manager_payout -= fee_amount
+            #    total_payments += fee_amount
             # Manager Payment
             if manager_payout > 0:
                 acc_payments.append(TrezorPayment(

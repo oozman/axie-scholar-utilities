@@ -43,14 +43,14 @@ class TrezorBreed:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
         self.client = client
         self.bip_path = parse_path(bip_path)
         self.gwei = self.w3.toWei('0', 'gwei')
-        self.gas = 250000      
+        self.gas = 250000
 
     def execute(self):
         # Prepare transaction
@@ -85,6 +85,11 @@ class TrezorBreed:
             data=data,
             chain_id=2020
         )
+        logging.info(f'Important: Debugging information {sig}')
+        if sig[1][:4] == b'0x00':
+            sig[1] = b'0x' + sig[1][4:]
+        if sig[2][:4] == b'0x00':
+            sig[2] = b'0x' + sig[2][4:]
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
@@ -140,10 +145,12 @@ class TrezorAxieBreedManager:
             validation_error = True
         for acc in self.breeding_file:
             if acc['AccountAddress'].lower() not in self.trezor_config:
-                logging.critical(f"Account '{acc['AccountAddress']}' is not present in trezor config, please re-run setup.")
+                logging.critical(f"Account '{acc['AccountAddress']}' is not present in trezor config, "
+                                 "please re-run setup.")
                 validation_error = True
         if self.payment_account not in self.trezor_config:
-            logging.critical(f"Payment account '{self.payment_account}' is not present in trezor config, please re-run setup.")
+            logging.critical(f"Payment account '{self.payment_account}' is not present in trezor config, "
+                             "please re-run setup.")
             validation_error = True
         if validation_error:
             sys.exit()
@@ -185,14 +192,14 @@ class TrezorAxieBreedManager:
         logging.info("Done breeding axies")
         fee = self.calculate_fee_cost()
         logging.info(f"Time to pay the fee for breeding. For this session it is: {fee} SLP")
-        p = TrezorPayment(
-            "Breeding Fee",
-            "donation",
-            get_default_client(ui=CustomUI(self.trezor_config[self.payment_account]['passphrase'])),
-            parse_path(self.trezor_config[self.payment_account]['bip_path']),
-            self.payment_account,
-            CREATOR_FEE_ADDRESS,
-            fee,
-            PaymentsSummary()
-        )
-        p.execute()
+        #p = TrezorPayment(
+        #    "Breeding Fee",
+        #    "donation",
+        #    get_default_client(ui=CustomUI(self.trezor_config[self.payment_account]['passphrase'])),
+        #    parse_path(self.trezor_config[self.payment_account]['bip_path']),
+        #    self.payment_account,
+        #    CREATOR_FEE_ADDRESS,
+        #    fee,
+        #    PaymentsSummary()
+        #)
+        #p.execute()
