@@ -122,10 +122,10 @@ class TrezorClaim(TrezorAxieGraphQL):
             chain_id=2020
         )
         logging.info(f'Important: Debugging information {sig}')
-        if sig[1][:4] == b'0x00':
-            sig[1] = b'0x' + sig[1][4:]
-        if sig[2][:4] == b'0x00':
-            sig[2] = b'0x' + sig[2][4:]
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
@@ -186,7 +186,7 @@ class TrezorAxieClaimsManager:
         claims_list = [
             TrezorClaim(
                 account=acc,
-                client=get_default_client(ui=CustomUI(self.trezor_config[acc]['passphrase'])),
+                client=get_default_client(ui=CustomUI(passphrase=self.trezor_config[acc]['passphrase'])),
                 bip_path=self.trezor_config[acc]['bip_path'],
                 acc_name=self.acc_names[acc]) for acc in self.trezor_config]
         logging.info("Claiming starting...")
