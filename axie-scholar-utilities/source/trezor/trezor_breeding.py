@@ -86,10 +86,10 @@ class TrezorBreed:
             chain_id=2020
         )
         logging.info(f'Important: Debugging information {sig}')
-        if sig[1][:4] == b'0x00':
-            sig[1] = b'0x' + sig[1][4:]
-        if sig[2][:4] == b'0x00':
-            sig[2] = b'0x' + sig[2][4:]
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
@@ -192,14 +192,14 @@ class TrezorAxieBreedManager:
         logging.info("Done breeding axies")
         fee = self.calculate_fee_cost()
         logging.info(f"Time to pay the fee for breeding. For this session it is: {fee} SLP")
-        #p = TrezorPayment(
-        #    "Breeding Fee",
-        #    "donation",
-        #    get_default_client(ui=CustomUI(self.trezor_config[self.payment_account]['passphrase'])),
-        #    parse_path(self.trezor_config[self.payment_account]['bip_path']),
-        #    self.payment_account,
-        #    CREATOR_FEE_ADDRESS,
-        #    fee,
-        #    PaymentsSummary()
-        #)
-        #p.execute()
+        p = TrezorPayment(
+            "Breeding Fee",
+            "donation",
+            get_default_client(ui=CustomUI(self.trezor_config[self.payment_account]['passphrase'])),
+            parse_path(self.trezor_config[self.payment_account]['bip_path']),
+            self.payment_account,
+            CREATOR_FEE_ADDRESS,
+            fee,
+            PaymentsSummary()
+        )
+        p.execute()

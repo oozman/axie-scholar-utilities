@@ -86,10 +86,10 @@ class TrezorTransfer:
             chain_id=2020
         )
         logging.info(f'Important: Debugging information {sig}')
-        if sig[1][:4] == b'0x00':
-            sig[1] = b'0x' + sig[1][4:]
-        if sig[2][:4] == b'0x00':
-            sig[2] = b'0x' + sig[2][4:]
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
