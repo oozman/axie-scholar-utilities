@@ -2,7 +2,7 @@ import sys
 import asyncio
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 
 from requests.exceptions import RetryError
@@ -31,7 +31,7 @@ logger.addHandler(file_handler)
 
 
 class Claim(AxieGraphQL):
-    def __init__(self, acc_name, **kwargs):
+    def __init__(self, acc_name, force, **kwargs):
         super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(
@@ -44,7 +44,15 @@ class Claim(AxieGraphQL):
             abi=slp_abi
         )
         self.acc_name = acc_name
+        self.force = force
         self.request = requests.Session()
+
+    def localize_date(self, date_utc):
+        return date_utc.replace(tzinfo=timezone.utc).astimezone(tz=None)
+
+    def humanize_date(self, date):
+        local_date = self.localize_date(date)
+        return local_date.strftime("%m/%d/%Y, %H:%M")
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
@@ -55,8 +63,17 @@ class Claim(AxieGraphQL):
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
-            in_game_total = int(response.json()['total'])
+            data = response.json()
+            last_claimed = datetime.utcfromtimestamp(data['last_claimed_item_at'])
+            next_claim_date = last_claimed + timedelta(days=14)
+            utcnow = datetime.utcnow()
+            if utcnow < next_claim_date and not self.force:
+                logging.critical(f"This account will be claimable again on {self.humanize_date(next_claim_date)}.")
+                return None
+            elif self.force:
+                logging.info('Skipping check of dates, --force option was selected')
             wallet_total = check_balance(self.account)
+            in_game_total = int(data['total'])
             if in_game_total > wallet_total:
                 return in_game_total - wallet_total
         return None
@@ -135,18 +152,23 @@ class Claim(AxieGraphQL):
 
 
 class AxieClaimsManager:
-    def __init__(self, payments_file, secrets_file):
+    def __init__(self, payments_file, secrets_file, force=False):
         self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(secrets_file, payments_file)
+        self.force = force
 
-    def load_secrets_and_acc_name(self, secrets_file, payments_file):
-        secrets = load_json(secrets_file)
-        payments = load_json(payments_file)
+    def load_secrets_and_acc_name(self, secrets, payments):
         refined_secrets = {}
         acc_names = {}
-        for scholar in payments['Scholars']:
-            key = scholar['AccountAddress']
-            refined_secrets[key] = secrets[key]
-            acc_names[key] = scholar['Name']
+        if 'Manager' in payments:
+            for scholar in payments['Scholars']:
+                key = scholar['AccountAddress']
+                refined_secrets[key] = secrets[key]
+                acc_names[key] = scholar['Name']
+        else:
+            for scholar in payments['scholars']:
+                key = scholar['ronin']
+                refined_secrets[key] = secrets[key]
+                acc_names[key] = scholar['name']
         return refined_secrets, acc_names
 
     def verify_inputs(self):
@@ -170,6 +192,7 @@ class AxieClaimsManager:
     def prepare_claims(self):
         claims_list = [
             Claim(
+                force=self.force,
                 account=acc,
                 private_key=self.secrets_file[acc],
                 acc_name=self.acc_names[acc]) for acc in self.secrets_file]
