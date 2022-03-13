@@ -1,9 +1,11 @@
+import os
 import sys
 import builtins
 import json
 
 from docopt import docopt, DocoptExit
 from mock import patch, call
+import requests_mock
 import pytest
 
 import axie_scholar_cli as cli
@@ -13,6 +15,7 @@ import axie_scholar_cli as cli
                          [
                             (["payout", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -20,6 +23,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -30,11 +34,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": True}),
                             (["payout", "file1", "file2", "-y"],
                              {"--help": False,
+                             "--force": False,
                               "--version": False,
                               "--yes": True,
                               "--safe-mode": False,
@@ -42,6 +51,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -52,11 +62,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": True}),
                             (["payout", "file1", "file2", "--yes"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": True,
                               "--safe-mode": False,
@@ -64,6 +79,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -74,11 +90,100 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": True}),
+                            (["managed_payout", "file1", "secret", "--yes"],
+                             {"--help": False,
+                              "--force": False,
+                              "--version": False,
+                              "--yes": True,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<token>': "secret",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': True,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["managed_payout", "file1", "secret", "-y"],
+                             {"--help": False,
+                              "--force": False,
+                              "--version": False,
+                              "--yes": True,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<token>': "secret",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': True,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["managed_payout", "file1", "secret"],
+                             {"--help": False,
+                              "--force": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<token>': "secret",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': True,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
                             (["claim", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -86,6 +191,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -96,11 +202,100 @@ import axie_scholar_cli as cli
                               "claim": True,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["claim", "file1", "file2", "--force"],
+                             {"--help": False,
+                              "--force": True,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": "file1",
+                              "<secrets_file>": "file2",
+                              '<token>': None,
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": True,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["managed_claim", "file1", "secret", "--force"],
+                             {"--help": False,
+                              "--force": True,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<token>': "secret",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': True,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["managed_claim", "file1", "secret"],
+                             {"--help": False,
+                              "--force": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<token>': "secret",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': True,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_secrets", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -108,6 +303,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": None,
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -118,11 +314,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": True,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_secrets", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -130,6 +331,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -140,11 +342,44 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": True,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["managed_generate_secrets", "file1", "secret"],
+                             {"--help": False,
+                              "--force": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<token>': "secret",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': True,
+                              'managed_payout': False,
+                              "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["transfer_axies", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -152,6 +387,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': "file1",
                               'transfer_axies': True,
                               '<csv_file>': None,
@@ -160,6 +396,10 @@ import axie_scholar_cli as cli
                               'axie_breeding': False,
                               'generate_breedings': False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -167,6 +407,7 @@ import axie_scholar_cli as cli
                               "payout": False}),
                             (["transfer_axies", "file1", "file2", "--safe-mode"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": True,
@@ -174,6 +415,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': "file1",
                               'transfer_axies': True,
                               '<csv_file>': None,
@@ -184,11 +426,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["mass_update_secrets", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -196,6 +443,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
@@ -206,11 +454,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_payments", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -218,6 +471,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file2",
                               "<secrets_file>": None,
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
@@ -228,11 +482,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': True,
                               "payout": False}),
                             (["generate_payments", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -240,6 +499,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": None,
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
@@ -250,11 +510,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': True,
                               "payout": False}),
                             (["axie_morphing", "file1", "a,b,c"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -262,6 +527,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': True,
                               "<payments_file>": None,
                               "<secrets_file>": "file1",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -272,11 +538,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["axie_breeding", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -284,6 +555,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -294,11 +566,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_QR", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -306,6 +583,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
@@ -316,11 +594,44 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": True,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["managed_generate_QR", "file1", "secret"],
+                             {"--help": False,
+                              "--force": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<token>': "secret",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': True,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_breedings", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -328,6 +639,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": None,
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
@@ -338,11 +650,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_breedings", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -350,6 +667,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": None,
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
@@ -360,11 +678,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_transfer_axies", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -372,6 +695,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": None,
+                              '<token>': None,
                               '<transfers_file>': "file2",
                               'transfer_axies': False,
                               '<csv_file>': "file1",
@@ -382,11 +706,16 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': True,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_transfer_axies", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -394,6 +723,7 @@ import axie_scholar_cli as cli
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": None,
+                              '<token>': None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
@@ -404,6 +734,10 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': True,
+                              'managed_claim': False,
+                              'managed_generate_QR': False,
+                              'managed_generate_secrets': False,
+                              'managed_payout': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False})
@@ -418,6 +752,8 @@ def test_parses_params(params, expected_result):
                             (["a", "b", "c"]),
                             (["generate_QR"]),
                             (["generate_QR", "file1"]),
+                            (["managed_generate_QR"]),
+                            (["managed_generate_QR", "file1"]),
                             (["mass_update_secrets"]),
                             (["mass_update_secrets", "file1"]),
                             (["mass_update_secrets", "file1", "file2", "file3"]),
@@ -427,6 +763,9 @@ def test_parses_params(params, expected_result):
                             (["transfer_axies", "file1", "file2", "file3"]),
                             (["claim"]),
                             (["claim", "file1"]),
+                            (["managed_payout"]),
+                            (["managed_payout", "file1"]),
+                            (["managed_payout", "file1", "file2", "file3"]),
                             (["payout"]),
                             (["payout", "file1"]),
                             (["payout", "file1", "file2", "file3"]),
@@ -656,6 +995,25 @@ def test_generate_secrets_partially_there(tmpdir):
                          '    "ronin:<account_s2_address>": "some_input"\n}')
 
 
+@patch("axie_scholar_cli.load_payments_file", return_value={'Scholars': [{'Name': 'Acc1', 'AccountAddress': 'ronin:<account_s1_address>'}]})
+@patch("axie.AxiePaymentsManager.__init__", return_value=None)
+@patch("axie.AxiePaymentsManager.verify_inputs")
+@patch("axie.AxiePaymentsManager.prepare_payout")
+def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, mocked_paymentsmanager, mocked_load, tmpdir):
+    f1 = tmpdir.join("file2.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "payout", str(f1), "token"]):
+        cli.run_cli()
+    mock_prepare_payout.assert_called_with()
+    mock_verify_input.assert_called_with()
+    mocked_load.assert_called_with("token")
+    mocked_paymentsmanager.assert_called_with(
+        {'Scholars': [{'Name': 'Acc1', 'AccountAddress': 'ronin:<account_s1_address>'}]},
+        {'ronin:<account_s1_address>': 'hello'},
+        auto=False
+    )
+
+
 @patch("axie.AxiePaymentsManager.__init__", return_value=None)
 @patch("axie.AxiePaymentsManager.verify_inputs")
 @patch("axie.AxiePaymentsManager.prepare_payout")
@@ -668,7 +1026,11 @@ def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, moc
         cli.run_cli()
     mock_prepare_payout.assert_called_with()
     mock_verify_input.assert_called_with()
-    mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=False)
+    mocked_paymentsmanager.assert_called_with(
+        {'Scholars': [{'Name': 'Acc1', 'AccountAddress': 'ronin:<account_s1_address>'}]},
+        {'ronin:<account_s1_address>': 'hello'},
+        auto=False
+    )
 
 
 @patch("axie.AxiePaymentsManager.__init__", return_value=None)
@@ -683,7 +1045,11 @@ def test_payout_takes_auto_parameter_yes(mock_prepare_payout, mock_verify_inputs
         cli.run_cli()
     mock_prepare_payout.assert_called_with()
     mock_verify_inputs.assert_called_with()
-    mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=True)
+    mocked_paymentsmanager.assert_called_with(
+        {'Scholars': [{'Name': 'Acc1', 'AccountAddress': 'ronin:<account_s1_address>'}]},
+        {'ronin:<account_s1_address>': 'hello'},
+        auto=True
+    )
 
 
 @patch("axie.AxieClaimsManager.__init__", return_value=None)
@@ -698,7 +1064,67 @@ def test_claim(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, tmpd
         cli.run_cli()
     mock_verify_inputs.assert_called_with()
     mock_prepare_claims.assert_called_with()
-    mock_claimsmanager.assert_called_with(str(f1), str(f2))
+    mock_claimsmanager.assert_called_with(
+        {'ronin:<account_s1_address>': 'hello'},
+        {'ronin:<account_s1_address>': 'hello'},
+        False
+    )
+
+@patch("axie.AxieClaimsManager.__init__", return_value=None)
+@patch("axie.AxieClaimsManager.prepare_claims")
+@patch("axie.AxieClaimsManager.verify_inputs")
+def test_claim_foced(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    f2 = tmpdir.join("file2.json")
+    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "claim", str(f1), str(f2), '--force']):
+        cli.run_cli()
+    mock_verify_inputs.assert_called_with()
+    mock_prepare_claims.assert_called_with()
+    mock_claimsmanager.assert_called_with(
+        {'ronin:<account_s1_address>': 'hello'},
+        {'ronin:<account_s1_address>': 'hello'},
+        True
+    )
+
+
+@patch("axie_scholar_cli.load_payments_file", return_value={"foo": "bar"})
+@patch("axie.AxieClaimsManager.__init__", return_value=None)
+@patch("axie.AxieClaimsManager.prepare_claims")
+@patch("axie.AxieClaimsManager.verify_inputs")
+def test_managed_claim(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, mock_load, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "managed_claim", str(f1), "secret_token"]):
+        cli.run_cli()
+    mock_verify_inputs.assert_called_with()
+    mock_prepare_claims.assert_called_with()
+    mock_load.assert_called_with("secret_token")
+    mock_claimsmanager.assert_called_with(
+        {"foo": "bar"},
+        {'ronin:<account_s1_address>': 'hello'},
+        False
+    )
+
+
+@patch("axie_scholar_cli.load_payments_file", return_value={"foo": "bar"})
+@patch("axie.AxieClaimsManager.__init__", return_value=None)
+@patch("axie.AxieClaimsManager.prepare_claims")
+@patch("axie.AxieClaimsManager.verify_inputs")
+def test_managed_claim_forced(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, mock_load, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "managed_claim", str(f1), "secret_token", '--force']):
+        cli.run_cli()
+    mock_verify_inputs.assert_called_with()
+    mock_prepare_claims.assert_called_with()
+    mock_load.assert_called_with("secret_token")
+    mock_claimsmanager.assert_called_with(
+        {"foo": "bar"},
+        {'ronin:<account_s1_address>': 'hello'},
+        True
+    )
 
 
 def test_claim_file_check_fail(caplog):
@@ -823,8 +1249,37 @@ def test_qrcode(mock_execute, mock_qrcodemanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    f2.write('{"ronin:<account_s1_address>": "bye"}')
     with patch.object(sys, 'argv', ["", "generate_QR", str(f1), str(f2)]):
         cli.run_cli()
     mock_execute.assert_called_with()
-    mock_qrcodemanager.assert_called_with(str(f1), str(f2))
+    mock_qrcodemanager.assert_called_with({'ronin:<account_s1_address>': 'hello'}, {'ronin:<account_s1_address>': 'bye'}, os.path.dirname(f2))
+
+
+def test_load_payments():
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://api.axie.management/external/epithslayer/user/scholars",
+                       json={"foo": "bar"})
+        r = cli.load_payments_file("token")
+    assert r == {"foo": "bar"}
+
+
+def test_load_payments_500(caplog):
+    with patch.object(sys, 'exit') as mocked_sys:
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post("https://api.axie.management/external/epithslayer/user/scholars", status_code=500)
+            r = cli.load_payments_file("token")
+    mocked_sys.assert_called_once()
+    assert r == None
+    assert 'Something went wrong on axie.management side. Go to their Discord see what is it about!' in caplog.text
+    assert 'Could not retrieve your information from axie.management, double check your token' in caplog.text
+
+def test_load_payments_426(caplog):
+    with patch.object(sys, 'exit') as mocked_sys:
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post("https://api.axie.management/external/epithslayer/user/scholars", status_code=426)
+            r = cli.load_payments_file("token")
+    mocked_sys.assert_called_once()
+    assert r == None
+    assert 'You have been doing too many requests to axie.management, please wait 5min before a retry' in caplog.text
+    assert 'Could not retrieve your information from axie.management, double check your token' in caplog.text
