@@ -174,7 +174,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v2.0.1')
+    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v2.0.3')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
@@ -252,7 +252,7 @@ def run_cli():
         if config_file_path and check_file(config_file_path):
             logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
                          'have configured the tool for all the accounts present in payments.json')
-            tas = TrezorAccountsSetup(payments, load_json(config_file_path), config_file_path)
+            tas = TrezorAccountsSetup(payments, load_json(config_file_path), config_file_path, type='new')
             tas.update_trezor_config()
         else:
             logging.critical("Please review your file paths and re-try.")

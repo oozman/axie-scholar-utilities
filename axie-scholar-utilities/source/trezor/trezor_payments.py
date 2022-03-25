@@ -253,6 +253,13 @@ class TrezorAxiePaymentsManager:
             if acc["ronin"] not in self.trezor_config:
                 logging.critical(f"Account '{acc['name']}' is not present in trezor_config file, please add it.")
                 validation_success = False
+            # Check all splits have a "manager" persona
+            personas = []
+            for split in acc["splits"]:
+                personas.append(split["persona"].lower())
+            if "manager" not in personas:
+                logging.critical(f"Account '{acc['name']}' has no manager in its splits. Please review it!")
+                validation_success = False
 
         if not validation_success:
             logging.critical("Please make sure your payments.json file looks like the payments one in the wiki or the sample files.\n"
@@ -273,8 +280,8 @@ class TrezorAxiePaymentsManager:
             self.type = "new"
         except ValidationError as ex:
             new_msg = ("If you were tyring to pay using the current format:\n"
-                          f"Error given: {ex.message}\n"
-                          f"For attribute in: {list(ex.path)}\n")
+                       f"Error given: {ex.message}\n"
+                       f"For attribute in: {list(ex.path)}\n")
             validation_success = False
 
         if not self.type:
@@ -284,8 +291,8 @@ class TrezorAxiePaymentsManager:
                 validation_success = True
             except ValidationError as ex:
                 legacy_msg = ("If you were tyring to pay using the legacy format:\n"
-                               f"Error given: {ex.message}\n"
-                               f"For attribute in: {list(ex.path)}\n")
+                              f"Error given: {ex.message}\n"
+                              f"For attribute in: {list(ex.path)}\n")
                 validation_success = False
         
         if not validation_success:
