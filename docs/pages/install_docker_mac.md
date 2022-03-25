@@ -23,7 +23,7 @@ If you go this route, I recomend also setting up these alias in your terminal to
     # Alias to generate secrets
     axie-utils-gen-secrets() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
     # Alias to managed generate secrets
-    axie-utils-gen-secrets() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities managed_generate_secrets files/secrets.json ${2}}
+    axie-utils-managed-gen-secrets() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities managed_generate_secrets files/secrets.json ${2}}
     # Alias to generate payments
     axie-utils-gen-payments() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.csv -v ${PWD}/${2}:/opt/app/files/payments.json epith/axie-scholar-utilities generate_payments files/payments.csv files/payments.json}
     # Alias to mass update secrets
@@ -31,23 +31,23 @@ If you go this route, I recomend also setting up these alias in your terminal to
     # Alias to execute claims
     axie-utils-claim() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities claim files/payments.json files/secrets.json}
     # Alias to managed execute claims
-    axie-utils-claim() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities claim files/secrets.json ${2}}
+    axie-utils-managed-claim() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities claim files/secrets.json ${2}}
     # Alias to execute payments
     axie-utils-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
     # Alias to managed execute payments
-    axie-utils-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities managed_payout files/secrets.json ${2}}
+    axie-utils-managed-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities managed_payout files/secrets.json ${2}}
     # Alias to execute auto-payments (no confirmation)
     axie-utils-auto-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
     # Alias to managed execute auto-payments (no confirmation)
-    axie-utils-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities managed_payout files/secrets.json ${2} -y}
+    axie-utils-managed-auto-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities managed_payout files/secrets.json ${2} -y}
     # Alias to execute axie transfers
     axie-utils-transfer-axies() {docker run -it -v ${PWD}/${1}:/opt/app/files/transfers.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json}
     # Alias to generate transfers file
     axie-utils-gen-transfers() {docker run -it -v ${PWD}/${1}:/opt/app/files/transfers.csv -v ${PWD}/${2}:/opt/app/files/transfers.json epith/axie-scholar-utilities generate_transfer_axies files/transfers.csv files/transfers.json}
     # Alias to execute generate_qr
     axie-utils-gen-QR() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json}
-    # Alias to execute generate_qr
-    axie-utils-gen-QR() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/secrets.json ${2}}
+    # Alias to execute managed generate_qr
+    axie-utils-managed-gen-QR() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities managed_generate_QR files/secrets.json ${2}}
     # Alias to generate breedings file
     axie-utils-gen-breedings() {docker run -it -v ${PWD}/${1}:/opt/app/files/breedings.csv -v ${PWD}/${2}:/opt/app/files/breedings.json epith/axie-scholar-utilities generate_breedings files/breedings.csv files/breedings.json}
     # Alias to breed axies
