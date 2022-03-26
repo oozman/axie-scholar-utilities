@@ -320,8 +320,9 @@ class AxiePaymentsManager:
             total_payments = 0
             acc_payments = []
             deductable_fees = 1
-            for dono in self.donations:
-                deductable_fees += dono['percentage']
+            if self.donations:
+                for dono in self.donations:
+                    deductable_fees += dono['percentage']
             # Split payments
             for sacc in acc['splits']:
                 if sacc['persona'].lower() == 'manager':
@@ -365,17 +366,17 @@ class AxiePaymentsManager:
                                 self.summary
                             ))
             # Fee Payments
-            fee_amount = round(acc_balance * 0.01)
-            if fee_amount > 0:
-                acc_payments.append(Payment(
-                            f"Donation to software creator for {acc['name']}",
-                            "donation",
-                            acc["ronin"],
-                            self.secrets_file[acc["ronin"]],
-                            CREATOR_FEE_ADDRESS,
-                            fee_amount,
-                            self.summary
-                        ))
+            #fee_amount = round(acc_balance * 0.01)
+            #if fee_amount > 0:
+            #    acc_payments.append(Payment(
+            #                f"Donation to software creator for {acc['name']}",
+            #                "donation",
+            #                acc["ronin"],
+            #                self.secrets_file[acc["ronin"]],
+            #                CREATOR_FEE_ADDRESS,
+            #                fee_amount,
+            #                self.summary
+            #            ))
             if self.check_acc_has_enough_balance(acc['ronin'], total_payments) and acc_balance > 0:
                 self.payout_account(acc['name'], acc_payments)
             else:
